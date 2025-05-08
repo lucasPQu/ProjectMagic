@@ -1,0 +1,35 @@
+.logo {
+  width: 80px;
+  height: auto;
+}
+
+[data-bs-theme="dark"] {
+  --bs-navbar-bg: #fd7a00; /* Preto no modo escuro */
+  --bs-navbar-color: #000000; /* Branco no modo escuro */
+  .btn-primary {
+    --bs-btn-bg:#fd7a00;
+  };
+  .dropdown-menu {
+    --bs-dropdown-link-active-bg: #99999980 !important;
+  }
+}
+
+[data-bs-theme="light"] {
+  --bs-navbar-bg: #6E8B3D; /* Preto no modo escuro */
+  --bs-navbar-color: #fff; /* Branco no modo escuro */
+  .dropdown-menu {
+    --bs-dropdown-link-active-bg: #99999980 !important;
+  };
+}
+
+body {
+  font-family: 'Crimson Pro', serif;
+}
+
+
+.dm-serif-display-regular {
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
