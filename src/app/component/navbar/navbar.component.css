@@ -4,10 +4,10 @@
 }
 
 [data-bs-theme="dark"] {
-  --bs-navbar-bg: #fd7a00; /* Preto no modo escuro */
+  --bs-navbar-bg: #febd59; /* Preto no modo escuro */
   --bs-navbar-color: #000000; /* Branco no modo escuro */
   .btn-primary {
-    --bs-btn-bg:#fd7a00;
+    --bs-btn-bg:#febd59;
   };
   .dropdown-menu {
     --bs-dropdown-link-active-bg: #99999980 !important;
@@ -15,8 +15,8 @@
 }
 
 [data-bs-theme="light"] {
-  --bs-navbar-bg: #6E8B3D; /* Preto no modo escuro */
-  --bs-navbar-color: #fff; /* Branco no modo escuro */
+  --bs-navbar-bg: #febd59; /* Preto no modo escuro */
+  --bs-navbar-color: #000000; /* Branco no modo escuro */
   .dropdown-menu {
     --bs-dropdown-link-active-bg: #99999980 !important;
   };

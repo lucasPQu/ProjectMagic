@@ -9,6 +9,10 @@ import { FooterComponent } from './component/footer/footer.component';
 import { HomeComponent } from './pages/home/home.component';
 import { BaseFormatBodyComponent } from './component/base-format-body/base-format-body.component';
 import { SearchCardsComponent } from './pages/search-cards/search-cards.component';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
+import { SearchCardService } from './services/search-card.service';
+import { HttpClientModule } from '@angular/common/http';
 
 @NgModule({
   declarations: [
@@ -21,9 +25,12 @@ import { SearchCardsComponent } from './pages/search-cards/search-cards.componen
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    CommonModule,
+    ReactiveFormsModule,
+    AppRoutingModule,
+    HttpClientModule,
   ],
-  providers: [],
+  providers: [SearchCardService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

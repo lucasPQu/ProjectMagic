@@ -1,0 +1,8 @@
+::ng-deep .custom-tooltip {
+  --bs-tooltip-bg: #00000081;
+  --bs-tooltip-color: #fff;
+  --bs-tooltip-padding-x: 1rem;
+  --bs-tooltip-padding-y: 0.75rem;
+  --bs-tooltip-max-width: 300px;
+  text-align: center;
+}

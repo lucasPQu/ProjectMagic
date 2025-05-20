@@ -13,12 +13,12 @@ export class NavbarComponent implements OnInit {
   themes = [{
     icon: "bi bi-brightness-high",
     temaBody: 'light',
-    temaHeader: '#6E8B3D',
+    temaHeader: '#febd59',
     title: 'Modo Claro'
   }, {
     icon: "bi bi-moon-stars",
     temaBody: 'dark',
-    temaHeader: "#fd7a00",
+    temaHeader: "#febd59",
     title: 'Modo Escuro'
   },];
 
