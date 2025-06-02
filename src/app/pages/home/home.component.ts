@@ -79,9 +79,13 @@ export class HomeComponent implements AfterViewChecked, OnInit {
           }
           });
 
+          if(resp.has_more){
+            this.searchNextPage(resp.next_page);
+          }else{
+            this.tooltipsInitialized = false;
+          }
+
           this.errorSearchCard = false;
-          this.tooltipsInitialized = false;
-          console.log(this.cardsList[0].cardImage.normal);
         },
         error => {
           this.errorSearchCard = true;
@@ -91,6 +95,40 @@ export class HomeComponent implements AfterViewChecked, OnInit {
     }else{
       this.errorSearchCard = true;
     }
+  }
+
+  searchNextPage(url: string): void {
+      this.searchCardService.searchNextPage(url).subscribe(
+              (resp) => {
+                const has_morePage = resp.has_more;
+                const next_morePage = resp.next_page.toString();
+                const cards = resp.data;
+                this.cardsList.push(...cards.map((card: any) => {
+                  if(!card.card_faces){
+                    return {
+                      nameCard: this.tratarNomeCards(card.name),
+                      cardImage: card.image_uris,
+                      cardType: card.type_line.split('-')[0],
+                      cardColor: JSON.stringify(card.color_identity),
+                      cardKeywords: card.keywords
+                    };
+                  }else{
+                    return {
+                      nameCard: this.tratarNomeCards(card.name),
+                      cardImage: card.card_faces[0].image_uris,
+                      cardType: card.type_line.split('-')[0],
+                      cardColor: JSON.stringify(card.color_identity),
+                      cardKeywords: card.keywords
+                    };
+                  }
+                }));
+                if(has_morePage){
+                  this.searchNextPage(next_morePage);
+                }else{
+                  this.tooltipsInitialized = false;
+                }
+              });
+
   }
 
   converterParaManaIcons(colorId: ColorId): string[] {

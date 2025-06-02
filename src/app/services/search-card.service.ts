@@ -14,4 +14,8 @@ export class SearchCardService {
     return this.http.get(this.apiUrl + name.replace(' ', ''));
   }
 
+  searchNextPage(url: string): Observable<any> {
+    return this.http.get(url);
+  }
+
 }
