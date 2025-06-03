@@ -46,7 +46,7 @@ export class HomeComponent implements AfterViewChecked, OnInit {
 
       tooltipTriggerList.forEach((el: HTMLElement) => {
         const title = el.getAttribute('data-bs-title');
-        if (title) {
+        if (title && !Tooltip.getInstance(el)) {
           new Tooltip(el);
         }
       });
@@ -55,63 +55,64 @@ export class HomeComponent implements AfterViewChecked, OnInit {
     }
   }
   onClickSearch(): void {
-    const name = this.form.get('nameSearchCard')?.value;
+    const name = this.form.get('nameSearchCard')?.value?.trim();
     if(name){
       this.searchCardService.searchCardsName(name).subscribe(
         (resp) => {
           const cards = resp.data;
           this.cardsList = cards.map((card: any) => {
             if(!card.card_faces){
+              console.log(card.type_line);
             return {
               nameCard: this.tratarNomeCards(card.name),
               cardImage: card.image_uris,
-              cardType: card.type_line.split('-')[0],
+              cardType: card.type_line? card.type_line.split('-')[0] : '',
               cardColor: JSON.stringify(card.color_identity),
               cardKeywords: card.keywords
             };
           }else{
+            console.log(card.type_line);
             return {
               nameCard: this.tratarNomeCards(card.name),
               cardImage: card.card_faces[0].image_uris,
-              cardType: card.type_line.split('-')[0],
+              cardType: card.type_line? card.type_line.split('-')[0] : '',
               cardColor: JSON.stringify(card.color_identity),
               cardKeywords: card.keywords
             };
           }
           });
+          this.tooltipsInitialized = false;
 
           if(resp.has_more){
             this.nextPage = resp.next_page.toString();
             this.showButtonNextPage = true;
           }else{
-            this.tooltipsInitialized = false;
             this.showButtonNextPage = false;
+            this.nextPage = '';
           }
-
+          console.log(this.errorSearchCard);
           this.errorSearchCard = false;
         },
         error => {
-          this.errorSearchCard = true;
-
+          this.desabilitarCamposErrorSearchCard();
         }
       );
     }else{
-      this.errorSearchCard = true;
+      this.desabilitarCamposErrorSearchCard();
     }
   }
 
   searchNextPage(): void {
+      if (!this.nextPage) return;
       this.searchCardService.searchNextPage(this.nextPage).subscribe(
               (resp) => {
-                const has_morePage = resp.has_more;
-                const next_morePage = resp.next_page.toString();
                 const cards = resp.data;
                 this.cardsList.push(...cards.map((card: any) => {
                   if(!card.card_faces){
                     return {
                       nameCard: this.tratarNomeCards(card.name),
                       cardImage: card.image_uris,
-                      cardType: card.type_line.split('-')[0],
+                      cardType: card.type_line? card.type_line.split('-')[0] : '',
                       cardColor: JSON.stringify(card.color_identity),
                       cardKeywords: card.keywords
                     };
@@ -119,26 +120,32 @@ export class HomeComponent implements AfterViewChecked, OnInit {
                     return {
                       nameCard: this.tratarNomeCards(card.name),
                       cardImage: card.card_faces[0].image_uris,
-                      cardType: card.type_line.split('-')[0],
+                      cardType: card.type_line? card.type_line.split('-')[0] : '',
                       cardColor: JSON.stringify(card.color_identity),
                       cardKeywords: card.keywords
                     };
                   }
                 }));
-                if(has_morePage){
-                  this.nextPage = next_morePage;
+                this.tooltipsInitialized = false;
+                if(resp.has_more){
+                  this.nextPage = resp.next_morePage.toString();
                   this.showButtonNextPage = true;
                 }else{
-                  this.tooltipsInitialized = false;
                   this.showButtonNextPage = false;
                   this.nextPage = '';
                 }
-              });
+              },
+              error => {
+                console.error('Erro ao buscar próxima página:', error);
+                this.showButtonNextPage = false;
+                this.tooltipsInitialized = false;
+              },
+            );
 
   }
 
   converterParaManaIcons(colorId: ColorId): string[] {
-  return Object.values(colorId).map(color => this.manaIcons[color] || '');
+    return Object.values(colorId).map(color => this.manaIcons[color] || '');
   }
 
   tratarNomeCards(nome: string): string {
@@ -146,4 +153,10 @@ export class HomeComponent implements AfterViewChecked, OnInit {
     return nomeTratado;
   }
 
+  desabilitarCamposErrorSearchCard(): void {
+    this.errorSearchCard = true;
+    this.cardsList = [];
+    this.showButtonNextPage = false;
+    this.tooltipsInitialized = false;
+  }
 }

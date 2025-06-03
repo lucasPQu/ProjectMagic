@@ -3,6 +3,13 @@
   --bs-tooltip-color: #fff;
   --bs-tooltip-padding-x: 1rem;
   --bs-tooltip-padding-y: 0.75rem;
-  --bs-tooltip-max-width: 300px;
+  --bs-tooltip-max-width: 350px;
   text-align: center;
+}
+
+::ng-deep .custom-tooltip .tooltip-inner img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
