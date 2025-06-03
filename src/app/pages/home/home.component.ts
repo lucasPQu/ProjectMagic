@@ -1,6 +1,5 @@
 import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import 'mana-font/css/mana.min.css';
 import { Tooltip } from 'bootstrap';
 import { ColorId, OutputCardList } from 'src/app/models/OutputCardList';
 import { SearchCardService } from 'src/app/services/search-card.service';
@@ -14,6 +13,8 @@ import { SearchCardService } from 'src/app/services/search-card.service';
 export class HomeComponent implements AfterViewChecked, OnInit {
   errorSearchCard = false;
   cardsList: OutputCardList[] = [];
+  nextPage: string = '';
+  showButtonNextPage = false;
   private tooltipsInitialized = false;
 
   manaIcons: { [key: string]: string } = {
@@ -80,9 +81,11 @@ export class HomeComponent implements AfterViewChecked, OnInit {
           });
 
           if(resp.has_more){
-            this.searchNextPage(resp.next_page);
+            this.nextPage = resp.next_page.toString();
+            this.showButtonNextPage = true;
           }else{
             this.tooltipsInitialized = false;
+            this.showButtonNextPage = false;
           }
 
           this.errorSearchCard = false;
@@ -97,8 +100,8 @@ export class HomeComponent implements AfterViewChecked, OnInit {
     }
   }
 
-  searchNextPage(url: string): void {
-      this.searchCardService.searchNextPage(url).subscribe(
+  searchNextPage(): void {
+      this.searchCardService.searchNextPage(this.nextPage).subscribe(
               (resp) => {
                 const has_morePage = resp.has_more;
                 const next_morePage = resp.next_page.toString();
@@ -123,9 +126,12 @@ export class HomeComponent implements AfterViewChecked, OnInit {
                   }
                 }));
                 if(has_morePage){
-                  this.searchNextPage(next_morePage);
+                  this.nextPage = next_morePage;
+                  this.showButtonNextPage = true;
                 }else{
                   this.tooltipsInitialized = false;
+                  this.showButtonNextPage = false;
+                  this.nextPage = '';
                 }
               });
 

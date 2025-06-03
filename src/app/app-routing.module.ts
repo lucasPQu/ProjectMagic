@@ -4,7 +4,11 @@ import { HomeComponent } from './pages/home/home.component';
 import { SearchCardsComponent } from './pages/search-cards/search-cards.component';
 
 const routes: Routes = [
-  {path: '', component: HomeComponent},
+  {
+    path: 'home',
+    loadChildren: () => import('./pages/home/home.module').then(m => m.HomeModule)
+  },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
   {path: 'search/cards', component: SearchCardsComponent},
 ];
 
@@ -13,5 +17,5 @@ const routes: Routes = [
   exports: [RouterModule]
 })
 export class AppRoutingModule {
-  
+
 }
