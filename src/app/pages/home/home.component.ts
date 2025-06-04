@@ -17,6 +17,8 @@ export class HomeComponent implements AfterViewChecked, OnInit {
   showButtonNextPage = false;
   private tooltipsInitialized = false;
 
+  visualizacaoAtiva: boolean = true;
+
   manaIcons: { [key: string]: string } = {
   G: '<i class="ms ms-g"></i>',
   R: '<i class="ms ms-r"></i>',
@@ -24,7 +26,6 @@ export class HomeComponent implements AfterViewChecked, OnInit {
   B: '<i class="ms ms-b"></i>',
   W: '<i class="ms ms-w"></i>'
 };
-
 
   form = new FormGroup({
     nameSearchCard: new FormControl('')
@@ -41,18 +42,26 @@ export class HomeComponent implements AfterViewChecked, OnInit {
   }
 
   ngAfterViewChecked(): void {
-    if (!this.tooltipsInitialized && this.cardsList?.length > 0) {
-      const tooltipTriggerList = this.elementRef.nativeElement.querySelectorAll('[data-bs-toggle="tooltip"]');
+    if (this.visualizacaoAtiva && !this.tooltipsInitialized && this.cardsList?.length > 0) {
+      this.inicializarTooltips();
+    }
+  }
+
+  inicializarTooltips(): void {
+  const tooltipTriggerList = this.elementRef.nativeElement.querySelectorAll('[data-bs-toggle="tooltip"]');
 
       tooltipTriggerList.forEach((el: HTMLElement) => {
         const title = el.getAttribute('data-bs-title');
-        if (title && !Tooltip.getInstance(el)) {
+        const tooltipExistente = Tooltip.getInstance(el);
+        if( tooltipExistente ) {
+          tooltipExistente.dispose();
+        }
+        if (title) {
           new Tooltip(el);
         }
       });
 
       this.tooltipsInitialized = true;
-    }
   }
   onClickSearch(): void {
     const name = this.form.get('nameSearchCard')?.value?.trim();
@@ -62,21 +71,19 @@ export class HomeComponent implements AfterViewChecked, OnInit {
           const cards = resp.data;
           this.cardsList = cards.map((card: any) => {
             if(!card.card_faces){
-              console.log(card.type_line);
             return {
               nameCard: this.tratarNomeCards(card.name),
               cardImage: card.image_uris,
               cardType: card.type_line? card.type_line.split('-')[0] : '',
-              cardColor: JSON.stringify(card.color_identity),
+              cardColor: card.color_identity,
               cardKeywords: card.keywords
             };
           }else{
-            console.log(card.type_line);
             return {
               nameCard: this.tratarNomeCards(card.name),
-              cardImage: card.card_faces[0].image_uris,
+              cardImage: card.card_faces[0].image_uris? card.card_faces[0].image_uris : card.image_uris,
               cardType: card.type_line? card.type_line.split('-')[0] : '',
-              cardColor: JSON.stringify(card.color_identity),
+              cardColor: card.color_identity,
               cardKeywords: card.keywords
             };
           }
@@ -128,7 +135,7 @@ export class HomeComponent implements AfterViewChecked, OnInit {
                 }));
                 this.tooltipsInitialized = false;
                 if(resp.has_more){
-                  this.nextPage = resp.next_morePage.toString();
+                  this.nextPage = resp.next_Page.toString();
                   this.showButtonNextPage = true;
                 }else{
                   this.showButtonNextPage = false;
@@ -142,6 +149,19 @@ export class HomeComponent implements AfterViewChecked, OnInit {
               },
             );
 
+  }
+
+  trocarVisualizacaoLista(): void{
+    if(!this.visualizacaoAtiva) {
+      this.visualizacaoAtiva = true;
+      this.tooltipsInitialized = false;
+    }
+  }
+
+  trocarVisualizacaoGrade(): void {
+    if (this.visualizacaoAtiva) {
+      this.visualizacaoAtiva = false;
+    }
   }
 
   converterParaManaIcons(colorId: ColorId): string[] {
