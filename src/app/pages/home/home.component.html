@@ -1,3 +1,4 @@
+<app-detalhes-card-modal #cardModalDetalhes></app-detalhes-card-modal>
 <div class="container">
   <div class="vstack gap-3">
     <form [formGroup]="form" (ngSubmit)="onClickSearch()" role="search">
@@ -71,6 +72,8 @@
           <tbody>
             <tr *ngFor="let card of cardsList">
               <td
+                (click)="mostrarDetalhesDaCarta(card)"
+                style="cursor: pointer"
                 data-bs-toggle="tooltip"
                 data-bs-html="true"
                 data-bs-placement="top"
@@ -119,6 +122,7 @@
           [src]="card.cardImage?.normal || card.cardImage?.large"
           class="card-img-top mx-auto d-block"
           [alt]="card.nameCard"
+          (click)="mostrarDetalhesDaCarta(card)"
           style="
             margin-top: 2%;
             object-fit: contain;

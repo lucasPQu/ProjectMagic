@@ -1,0 +1,51 @@
+<div
+  class="modal fade"
+  #detalhesCard
+  tabindex="-1"
+  aria-labelledby="titleCardLabel"
+  aria-hidden="true"
+  id="detalhesCardModal"
+>
+  <div
+    class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+  >
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="titleCardLabel">
+          Detalhes da Carta: {{ cartaSelecionada?.nameCard }}
+        </h1>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="fecharModal()"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-4 text-center">
+          <img
+            [src]="
+              cartaSelecionada?.cardImage?.large ||
+              cartaSelecionada?.cardImage?.normal
+            "
+            class="img-fluid mb-3"
+            [alt]="cartaSelecionada?.nameCard"
+            style="max-height: 400px; object-fit: contain"
+          />
+        </div>
+        <div class="col-md-8">
+          <p><strong>Tipo: </strong> {{ cartaSelecionada?.cardType }}</p>
+          <p>
+            <strong>Cores: </strong>
+            <span
+              *ngFor="
+                let icon of converterParaManaIcons(cartaSelecionada?.cardColor)
+              "
+              [innerHTML]="icon | safeHtml"
+            ></span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

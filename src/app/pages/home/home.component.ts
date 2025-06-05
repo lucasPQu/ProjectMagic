@@ -1,8 +1,10 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Tooltip } from 'bootstrap';
-import { ColorId, OutputCardList } from 'src/app/models/OutputCardList';
+import * as bootstrap from 'bootstrap';
+import { Modal, Tooltip } from 'bootstrap';
+import { OutputCardList } from 'src/app/models/OutputCardList';
 import { SearchCardService } from 'src/app/services/search-card.service';
+import { DetalhesCardModalComponent } from 'src/app/shared/components/detalhes-card-modal/detalhes-card-modal.component';
 
 
 @Component({
@@ -11,20 +13,27 @@ import { SearchCardService } from 'src/app/services/search-card.service';
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements AfterViewChecked, OnInit {
+
+  @ViewChild('cardModalDetalhes') detalhesCardModalInstance!: DetalhesCardModalComponent;
+
+  // Variáveis para controle de exibição de erros e botões
   errorSearchCard = false;
-  cardsList: OutputCardList[] = [];
-  nextPage: string = '';
   showButtonNextPage = false;
   private tooltipsInitialized = false;
-
   visualizacaoAtiva: boolean = true;
+
+  // Variáveis para controle de exibição de cards
+  cardsList: OutputCardList[] = [];
+  nextPage: string = '';
+
 
   manaIcons: { [key: string]: string } = {
   G: '<i class="ms ms-g"></i>',
   R: '<i class="ms ms-r"></i>',
   U: '<i class="ms ms-u"></i>',
   B: '<i class="ms ms-b"></i>',
-  W: '<i class="ms ms-w"></i>'
+  W: '<i class="ms ms-w"></i>',
+  C: '<i class="ms ms-c"></i>' // Adicionando o ícone de cor incolor
 };
 
   form = new FormGroup({
@@ -164,13 +173,24 @@ export class HomeComponent implements AfterViewChecked, OnInit {
     }
   }
 
-  converterParaManaIcons(colorId: ColorId): string[] {
-    return Object.values(colorId).map(color => this.manaIcons[color] || '');
+  converterParaManaIcons(colors: string[] | undefined | null): string[] {
+    if (!colors || colors.length === 0) {
+      return [this.manaIcons['C'] || ''];
+    }
+    return colors.map(color => this.manaIcons[color] || '');
   }
 
   tratarNomeCards(nome: string): string {
     const nomeTratado = nome.replace('-', ' ');
     return nomeTratado;
+  }
+
+  mostrarDetalhesDaCarta(carta: OutputCardList): void {
+    if (this.detalhesCardModalInstance) {
+      this.detalhesCardModalInstance.abrirModal(carta);
+    } else {
+      console.error("Instância do modal de detalhes não encontrada!");
+    }
   }
 
   desabilitarCamposErrorSearchCard(): void {
