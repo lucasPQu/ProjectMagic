@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Modal } from 'bootstrap';
 import { OutputCardList } from 'src/app/models/OutputCardList';
 
@@ -11,21 +12,39 @@ export class DetalhesCardModalComponent implements AfterViewInit {
 
   // variável para receber a carta selecionada do componente pai
   @Input() cartaSelecionada: OutputCardList | null = null;
+  oracleTextFormatted: SafeHtml | undefined;
 
   @ViewChild('detalhesCard') detalhesCardModalElement!: ElementRef;
 
   private modalBs!: Modal;
 
-manaIcons: { [key: string]: string } = {
-  G: '<i class="ms ms-g"></i>',
-  R: '<i class="ms ms-r"></i>',
-  U: '<i class="ms ms-u"></i>',
-  B: '<i class="ms ms-b"></i>',
-  W: '<i class="ms ms-w"></i>',
-  C: '<i class="ms ms-c"></i>' // Adicionando o ícone de cor incolor
+magicSimbols: { [key: string]: string } = {
+  G: '<i class="ms ms-g"></i>&nbsp;',
+  R: '<i class="ms ms-r"></i>&nbsp;',
+  U: '<i class="ms ms-u"></i>&nbsp;',
+  B: '<i class="ms ms-b"></i>&nbsp;',
+  W: '<i class="ms ms-w"></i>&nbsp;',
+  C: '<i class="ms ms-c"></i>&nbsp;', // Adicionando o ícone de cor incolor
+
+    '0': '<i class="ms ms-0"></i>',
+    '1': '<i class="ms ms-1"></i>',
+    '2': '<i class="ms ms-2"></i>',
+    '3': '<i class="ms ms-3"></i>',
+    '4': '<i class="ms ms-4"></i>',
+    '5': '<i class="ms ms-5"></i>',
+    '6': '<i class="ms ms-6"></i>',
+    '7': '<i class="ms ms-7"></i>',
+    '8': '<i class="ms ms-8"></i>',
+    '9': '<i class="ms ms-9"></i>',
+    '10': '<i class="ms ms-10"></i>',
+    '11': '<i class="ms ms-11"></i>',
+    '12': '<i class="ms ms-12"></i>',
+    'X': '<i class="ms ms-x"></i>',
+    'T': '<i class="ms ms-tap"></i>', // Símbolo de virar
+    'S': '<i class="ms ms-s"></i>'
 };
 
-  constructor() { }
+  constructor(private sanitizer: DomSanitizer) {}
 
   ngAfterViewInit(): void {
     if(this.detalhesCardModalElement){
@@ -38,9 +57,23 @@ manaIcons: { [key: string]: string } = {
 
   abrirModal(carta: OutputCardList): void {
     this.cartaSelecionada = carta;
+     if (carta.cardText) {
+    this.tratamentoTextoCarta(carta.cardText);
+    }
     if (this.modalBs) {
       this.modalBs.show();
     }
+  }
+
+  tratamentoTextoCarta(texto: string): void {
+    let cartaTextoTratado = texto;
+    cartaTextoTratado = cartaTextoTratado.trim();
+    cartaTextoTratado = cartaTextoTratado.replace(/\{([^{}]+)\}/g, (match, symbol) => {
+     const icon = this.magicSimbols[symbol.toUpperCase()] ;
+     return icon || match;
+    });
+    cartaTextoTratado = cartaTextoTratado.replace(/\s*\n\s*/g, '<br>');
+    this.oracleTextFormatted = this.sanitizer.bypassSecurityTrustHtml(cartaTextoTratado);
   }
 
   fecharModal(): void {
@@ -53,9 +86,9 @@ manaIcons: { [key: string]: string } = {
 
   converterParaManaIcons(colors: string[] | undefined | null): string[] {
     if (!colors || colors.length === 0) {
-      return [this.manaIcons['C'] || ''];
+      return [this.magicSimbols['C'] || ''];
     }
-    return colors.map(color => this.manaIcons[color] || '');
+    return colors.map(color => this.magicSimbols[color] || '');
   }
 
 }

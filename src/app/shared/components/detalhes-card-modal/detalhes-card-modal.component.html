@@ -7,12 +7,12 @@
   id="detalhesCardModal"
 >
   <div
-    class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+    class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable"
   >
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="titleCardLabel">
-          Detalhes da Carta: {{ cartaSelecionada?.nameCard }}
+          <strong>Detalhes da Carta:</strong> {{ cartaSelecionada?.nameCard }}
         </h1>
         <button
           type="button"
@@ -22,28 +22,37 @@
         ></button>
       </div>
       <div class="modal-body">
-        <div class="col-md-4 text-center">
-          <img
-            [src]="
-              cartaSelecionada?.cardImage?.large ||
-              cartaSelecionada?.cardImage?.normal
-            "
-            class="img-fluid mb-3"
-            [alt]="cartaSelecionada?.nameCard"
-            style="max-height: 400px; object-fit: contain"
-          />
-        </div>
-        <div class="col-md-8">
-          <p><strong>Tipo: </strong> {{ cartaSelecionada?.cardType }}</p>
-          <p>
-            <strong>Cores: </strong>
-            <span
-              *ngFor="
-                let icon of converterParaManaIcons(cartaSelecionada?.cardColor)
+        <div class="row">
+          <div class="col-md-5 text-center">
+            <img
+              [src]="
+                cartaSelecionada?.cardImage?.large ||
+                cartaSelecionada?.cardImage?.normal
               "
-              [innerHTML]="icon | safeHtml"
-            ></span>
-          </p>
+              class="img-fluid mb-3"
+              [alt]="cartaSelecionada?.nameCard"
+              style="max-height: 400px; object-fit: contain"
+            />
+          </div>
+
+          <div class="col-md-7">
+            <h3><strong>Descrição:</strong></h3>
+            <p [innerHTML]="oracleTextFormatted"></p>
+
+            <p><strong>Tipo: </strong> {{ cartaSelecionada?.cardType }}</p>
+
+            <p>
+              <strong>Cores: </strong>
+              <span
+                *ngFor="
+                  let icon of converterParaManaIcons(
+                    cartaSelecionada?.cardColor
+                  )
+                "
+                [innerHTML]="icon | safeHtml"
+              ></span>
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ export interface OutputCardList {
   cardType: string;
   cardColor: string[];
   cardKeywords?: string[];
+  cardText: string;
 }
 
 

@@ -85,7 +85,8 @@ export class HomeComponent implements AfterViewChecked, OnInit {
               cardImage: card.image_uris,
               cardType: card.type_line? card.type_line.split('-')[0] : '',
               cardColor: card.color_identity,
-              cardKeywords: card.keywords
+              cardKeywords: card.keywords,
+              cardText: card.oracle_text
             };
           }else{
             return {
@@ -93,13 +94,14 @@ export class HomeComponent implements AfterViewChecked, OnInit {
               cardImage: card.card_faces[0].image_uris? card.card_faces[0].image_uris : card.image_uris,
               cardType: card.type_line? card.type_line.split('-')[0] : '',
               cardColor: card.color_identity,
-              cardKeywords: card.keywords
+              cardKeywords: card.keywords,
+              cardText: card.card_faces[0].oracle_text? card.card_faces[0].oracle_text : card.oracle_text
             };
           }
           });
           this.tooltipsInitialized = false;
 
-          if(resp.has_more){
+          if(resp.has_more && resp.next_page) {
             this.nextPage = resp.next_page.toString();
             this.showButtonNextPage = true;
           }else{
@@ -129,26 +131,28 @@ export class HomeComponent implements AfterViewChecked, OnInit {
                       nameCard: this.tratarNomeCards(card.name),
                       cardImage: card.image_uris,
                       cardType: card.type_line? card.type_line.split('-')[0] : '',
-                      cardColor: JSON.stringify(card.color_identity),
-                      cardKeywords: card.keywords
+                      cardColor: card.color_identity,
+                      cardKeywords: card.keywords,
+                      cardText: card.oracle_text
                     };
                   }else{
                     return {
                       nameCard: this.tratarNomeCards(card.name),
-                      cardImage: card.card_faces[0].image_uris,
+                      cardImage: card.card_faces[0].image_uris? card.card_faces[0].image_uris : card.image_uris,
                       cardType: card.type_line? card.type_line.split('-')[0] : '',
-                      cardColor: JSON.stringify(card.color_identity),
-                      cardKeywords: card.keywords
+                      cardColor: card.color_identity,
+                      cardKeywords: card.keywords,
+                      cardText: card.card_faces[0].oracle_text? card.card_faces[0].oracle_text : card.oracle_text
                     };
                   }
                 }));
                 this.tooltipsInitialized = false;
-                if(resp.has_more){
+                if(resp.has_more && resp.next_Page) {
                   this.nextPage = resp.next_Page.toString();
                   this.showButtonNextPage = true;
                 }else{
-                  this.showButtonNextPage = false;
                   this.nextPage = '';
+                  this.showButtonNextPage = false;
                 }
               },
               error => {
@@ -159,6 +163,7 @@ export class HomeComponent implements AfterViewChecked, OnInit {
             );
 
   }
+
 
   trocarVisualizacaoLista(): void{
     if(!this.visualizacaoAtiva) {
@@ -187,6 +192,7 @@ export class HomeComponent implements AfterViewChecked, OnInit {
 
   mostrarDetalhesDaCarta(carta: OutputCardList): void {
     if (this.detalhesCardModalInstance) {
+      this.detalhesCardModalInstance.tratamentoTextoCarta(carta.cardText);
       this.detalhesCardModalInstance.abrirModal(carta);
     } else {
       console.error("Instância do modal de detalhes não encontrada!");
