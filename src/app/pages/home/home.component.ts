@@ -108,7 +108,6 @@ export class HomeComponent implements AfterViewChecked, OnInit {
             this.showButtonNextPage = false;
             this.nextPage = '';
           }
-          console.log(this.errorSearchCard);
           this.errorSearchCard = false;
         },
         error => {
