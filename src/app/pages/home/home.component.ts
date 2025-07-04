@@ -2,7 +2,8 @@ import { AfterViewChecked, AfterViewInit, Component, ElementRef, OnInit, ViewChi
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import * as bootstrap from 'bootstrap';
 import { Modal, Tooltip } from 'bootstrap';
-import { OutputCardList } from 'src/app/models/OutputCardList';
+import { ScryfallApiCard, ScryfallApiResponse } from 'src/app/models/OutputApiResponseSearchCard';
+import { ImageUris, OutputCardList } from 'src/app/models/OutputCardList';
 import { SearchCardService } from 'src/app/services/search-card.service';
 import { DetalhesCardModalComponent } from 'src/app/shared/components/detalhes-card-modal/detalhes-card-modal.component';
 
@@ -76,28 +77,27 @@ export class HomeComponent implements AfterViewChecked, OnInit {
     const name = this.form.get('nameSearchCard')?.value?.trim();
     if(name){
       this.searchCardService.searchCardsName(name).subscribe(
-        (resp) => {
+        (resp: ScryfallApiResponse) => {
           const cards = resp.data;
-          this.cardsList = cards.map((card: any) => {
-            if(!card.card_faces){
-            return {
-              nameCard: this.tratarNomeCards(card.name),
-              cardImage: card.image_uris,
-              cardType: card.type_line? card.type_line.split('-')[0] : '',
-              cardColor: card.color_identity,
-              cardKeywords: card.keywords,
-              cardText: card.oracle_text
+          this.cardsList = cards.map((card: ScryfallApiCard): OutputCardList => {
+            const defaultImageUris: ImageUris = {
+              normal: '', small: '', large: '', png: '', art_crop: '', border_crop: ''
             };
-          }else{
+            let cardImageToUse: ImageUris = defaultImageUris;
+            if (card.card_faces && card.card_faces.length > 0 && card.card_faces[0].image_uris) {
+              cardImageToUse = card.card_faces[0].image_uris;
+            } else if (card.image_uris) {
+              cardImageToUse = card.image_uris;
+            }
+
             return {
-              nameCard: this.tratarNomeCards(card.name),
-              cardImage: card.card_faces[0].image_uris? card.card_faces[0].image_uris : card.image_uris,
+              nameCard: this.tratarNomeCards(card.name || ''),
+              cardImage: cardImageToUse,
               cardType: card.type_line? card.type_line.split('-')[0] : '',
-              cardColor: card.color_identity,
-              cardKeywords: card.keywords,
-              cardText: card.card_faces[0].oracle_text? card.card_faces[0].oracle_text : card.oracle_text
+              cardColor: card.color_identity || [],
+              cardKeywords: card.keywords || [],
+              cardText: card.oracle_text || card.card_faces?.[0]?.oracle_text || ''
             };
-          }
           });
           this.tooltipsInitialized = false;
 
@@ -122,33 +122,32 @@ export class HomeComponent implements AfterViewChecked, OnInit {
 
   searchNextPage(): void {
       if (!this.nextPage) return;
-      this.searchCardService.searchNextPage(this.nextPage).subscribe(
-              (resp) => {
+      this.searchCardService.searchUrl(this.nextPage).subscribe(
+              (resp: ScryfallApiResponse) => {
                 const cards = resp.data;
-                this.cardsList.push(...cards.map((card: any) => {
-                  if(!card.card_faces){
+                this.cardsList.push(...cards.map((card: ScryfallApiCard): OutputCardList => {
+                const defaultImageUris: ImageUris = {
+                            normal: '', small: '', large: '', png: '', art_crop: '', border_crop: ''
+                          };
+
+                          let cardImageToUse: ImageUris = defaultImageUris;
+                          if (card.card_faces && card.card_faces.length > 0 && card.card_faces[0].image_uris) {
+                            cardImageToUse = card.card_faces[0].image_uris;
+                          } else if (card.image_uris) {
+                            cardImageToUse = card.image_uris;
+                          }
                     return {
-                      nameCard: this.tratarNomeCards(card.name),
-                      cardImage: card.image_uris,
+                      nameCard: this.tratarNomeCards(card.name || ''),
+                      cardImage: cardImageToUse,
                       cardType: card.type_line? card.type_line.split('-')[0] : '',
-                      cardColor: card.color_identity,
-                      cardKeywords: card.keywords,
-                      cardText: card.oracle_text
+                      cardColor: card.color_identity || [],
+                      cardKeywords: card.keywords || [],
+                      cardText: card.oracle_text || card.card_faces?.[0]?.oracle_text || ''
                     };
-                  }else{
-                    return {
-                      nameCard: this.tratarNomeCards(card.name),
-                      cardImage: card.card_faces[0].image_uris? card.card_faces[0].image_uris : card.image_uris,
-                      cardType: card.type_line? card.type_line.split('-')[0] : '',
-                      cardColor: card.color_identity,
-                      cardKeywords: card.keywords,
-                      cardText: card.card_faces[0].oracle_text? card.card_faces[0].oracle_text : card.oracle_text
-                    };
-                  }
                 }));
                 this.tooltipsInitialized = false;
-                if(resp.has_more && resp.next_Page) {
-                  this.nextPage = resp.next_Page.toString();
+                if(resp.has_more && resp.next_page) {
+                  this.nextPage = resp.next_page.toString();
                   this.showButtonNextPage = true;
                 }else{
                   this.nextPage = '';

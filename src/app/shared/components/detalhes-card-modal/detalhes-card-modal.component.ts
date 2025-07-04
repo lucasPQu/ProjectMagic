@@ -1,7 +1,10 @@
 import { AfterViewInit, Component, ElementRef, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Modal } from 'bootstrap';
-import { OutputCardList } from 'src/app/models/OutputCardList';
+import { ImageUris, OutputCardList } from 'src/app/models/OutputCardList';
+import { SearchCardService } from 'src/app/services/search-card.service';
+import { finalize } from 'rxjs/operators';
+import { ScryfallApiCard, ScryfallApiResponse } from 'src/app/models/OutputApiResponseSearchCard';
 
 @Component({
   selector: 'app-detalhes-card-modal',
@@ -13,6 +16,8 @@ export class DetalhesCardModalComponent implements AfterViewInit {
   // variável para receber a carta selecionada do componente pai
   @Input() cartaSelecionada: OutputCardList | null = null;
   oracleTextFormatted: SafeHtml | undefined;
+
+  carroselImagesCard: string[] = [];
 
   @ViewChild('detalhesCard') detalhesCardModalElement!: ElementRef;
 
@@ -44,7 +49,7 @@ magicSimbols: { [key: string]: string } = {
     'S': '<i class="ms ms-s"></i>'
 };
 
-  constructor(private sanitizer: DomSanitizer) {}
+  constructor(private sanitizer: DomSanitizer, private searchCardService: SearchCardService,) {}
 
   ngAfterViewInit(): void {
     if(this.detalhesCardModalElement){
@@ -53,10 +58,20 @@ magicSimbols: { [key: string]: string } = {
         keyboard: true
       });
     }
+
   }
 
   abrirModal(carta: OutputCardList): void {
     this.cartaSelecionada = carta;
+    this.carroselImagesCard = [];
+
+    const mainImage = this.cartaSelecionada?.cardImage?.normal || this.cartaSelecionada?.cardImage?.large || this.cartaSelecionada?.cardImage?.png;
+    if (mainImage) {
+      this.carroselImagesCard.push(mainImage);
+    }
+
+    this.receberImagensCarrossel();
+
      if (carta.cardText) {
     this.tratamentoTextoCarta(carta.cardText);
     }
@@ -64,6 +79,39 @@ magicSimbols: { [key: string]: string } = {
       this.modalBs.show();
     }
   }
+
+   receberImagensCarrossel(): void {
+    if (this.cartaSelecionada?.nameCard) {
+      this.searchCardService.searchVersionCard(this.cartaSelecionada.nameCard)
+        .pipe(
+          finalize(() => {})
+        )
+        .subscribe({
+          next: (resp: ScryfallApiResponse) => {
+            if (resp && resp.data && resp.data.length > 0) {
+              const newImages: string[] = [];
+              resp.data.forEach((card: ScryfallApiCard) => {
+                let imageUrl: string | undefined;
+                if (card.card_faces && card.card_faces.length > 0) {
+                  imageUrl = card.card_faces[0].image_uris?.normal || card.card_faces[0].image_uris?.large || card.card_faces[0].image_uris?.png;
+                } else {
+                  imageUrl = card.image_uris?.normal || card.image_uris?.large || card.image_uris?.png;
+                }
+
+                if (imageUrl && !this.carroselImagesCard.includes(imageUrl)) {
+                  newImages.push(imageUrl);
+                }
+              });
+              this.carroselImagesCard.push(...newImages);
+            }
+          },
+          error: (error) => {
+            console.error('Erro ao buscar versões da carta:', error);
+          }
+        });
+    }
+  }
+
 
   tratamentoTextoCarta(texto: string): void {
     let cartaTextoTratado = texto;
@@ -81,6 +129,7 @@ magicSimbols: { [key: string]: string } = {
       this.modalBs.hide();
     }
     this.cartaSelecionada = null;
+    this.carroselImagesCard = [];
   }
 
 
@@ -90,5 +139,6 @@ magicSimbols: { [key: string]: string } = {
     }
     return colors.map(color => this.magicSimbols[color] || '');
   }
+
 
 }

@@ -24,7 +24,65 @@
       <div class="modal-body">
         <div class="row">
           <div class="col-md-5 text-center">
+            <div
+              id="cardCarousel"
+              class="carousel slide"
+              data-bs-ride="carousel"
+              *ngIf="carroselImagesCard && carroselImagesCard.length > 0"
+            >
+              <div class="carousel-indicators">
+                <button
+                  type="button"
+                  data-bs-target="#cardCarousel"
+                  [attr.data-bs-slide-to]="i"
+                  [class.active]="i === 0"
+                  *ngFor="let img of carroselImagesCard; let i = index"
+                  aria-current="true"
+                  [attr.aria-label]="'Slide ' + (i + 1)"
+                ></button>
+              </div>
+              <div class="carousel-inner">
+                <div
+                  class="carousel-item"
+                  [class.active]="i === 0"
+                  *ngFor="let img of carroselImagesCard; let i = index"
+                >
+                  <img
+                    [src]="img"
+                    class="d-block w-100 img-fluid"
+                    [alt]="cartaSelecionada?.nameCard + ' - Imagem ' + (i + 1)"
+                    style="max-height: 400px; object-fit: contain"
+                  />
+                </div>
+              </div>
+              <button
+                class="carousel-control-prev"
+                type="button"
+                data-bs-target="#cardCarousel"
+                data-bs-slide="prev"
+              >
+                <span
+                  class="carousel-control-prev-icon custom-carousel-icon"
+                  aria-hidden="true"
+                ></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button
+                class="carousel-control-next"
+                type="button"
+                data-bs-target="#cardCarousel"
+                data-bs-slide="next"
+              >
+                <span
+                  class="carousel-control-next-icon custom-carousel-icon"
+                  aria-hidden="true"
+                ></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+
             <img
+              *ngIf="!carroselImagesCard || carroselImagesCard.length === 0"
               [src]="
                 cartaSelecionada?.cardImage?.large ||
                 cartaSelecionada?.cardImage?.normal
@@ -34,7 +92,6 @@
               style="max-height: 400px; object-fit: contain"
             />
           </div>
-
           <div class="col-md-7">
             <h3><strong>Descrição:</strong></h3>
             <p [innerHTML]="oracleTextFormatted"></p>

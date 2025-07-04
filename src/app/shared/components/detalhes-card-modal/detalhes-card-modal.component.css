@@ -1,3 +1,40 @@
 .oracle-text-description {
   white-space: pre-wrap;
 }
+
+/* Estilos para o modo claro (padrão) */
+.custom-carousel-icon {
+  /* Define a cor do ícone SVG para preto */
+  filter: invert(0) grayscale(100%) brightness(0%); /* Torna o SVG preto */
+}
+
+/* Estilos para o modo escuro */
+body.dark-mode .custom-carousel-icon,
+.dark-mode .custom-carousel-icon /* Se a classe dark-mode estiver no elemento pai do carrossel */ {
+  /* Define a cor do ícone SVG para branco */
+  filter: invert(1) grayscale(100%) brightness(100%); /* Torna o SVG branco */
+}
+
+/* Opcional: ajustar a cor de fundo do controle para melhor contraste */
+.carousel-control-prev,
+.carousel-control-next {
+  background-image: none; /* Remove o gradiente padrão do Bootstrap */
+  width: 5%; /* Ajusta a largura da área clicável */
+}
+
+.carousel-control-prev::before,
+.carousel-control-next::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  /* Cor de fundo para o modo claro */
+  background-color: rgba(255, 255, 255, 0.3); /* Um leve fundo branco transparente */
+}
+
+body.dark-mode .carousel-control-prev::before,
+body.dark-mode .carousel-control-next::before {
+  /* Cor de fundo para o modo escuro */
+  background-color: rgba(0, 0, 0, 0.3); /* Um leve fundo preto transparente */
+}
